@@ -1,33 +1,31 @@
 import React, { useState, useEffect } from "react";
+import 'antd/dist/antd.css';
+import { Input } from "antd";
+import { List, Typography } from 'antd';
 import axios from 'axios';
 import "./styles.css";
 import "./demo.css";
-import { Input } from "antd";
-import UserInput from "./InputField/UserInput";
-// import courseSeri from "./node/node"
+import UserInput from "./components/InputField/UserInput";
+import Score from "./components/circle/Score";
+import { setInputSelection } from "rc-mentions/lib/util";
 
-import Score from "./circle/Score";
 export default function App() {
     const [data, setData] = useState({ hits: [] });
+    const [score, setScore] = useState({ value: 0 });
+    const [inputName, setInputName] = useState('')
+    const [inputPrice, setInputPrice] = useState('')
 
     useEffect(() => {
         const fetchData = async (err) => {
             try {
-                const result = await axios(
-                    'http://localhost:5000/',
-                );
+                const result = await axios('http://localhost:5000/');
                 setData({ hits: result.data });
-                console.log(result.data)
-            } catch (error) {
-                console.log(Object.keys(error), error.message);
             }
+            catch (error) { console.log(Object.keys(error), error.message); }
         }
         fetchData();
     }, []);
 
-    const [stateWeighCO2, setStateC02] = useState({
-        stateValue: 0
-    });
     const getScore = () => {
         Array.prototype.sum = function (prop) {
             var total = 0
@@ -36,26 +34,39 @@ export default function App() {
             }
             return total / this.length
         }
-
-        setStateC02({
-            stateValue: `${Math.floor(data.hits.sum('price'))}`
-        })
+        setScore({ value: `${Math.floor(data.hits.sum('price'))}` })
 
     };
 
+
+
+
     return (
         <div className="App">
-            {data.hits.map((item, i) => (
+            {/* {data.hits.map((item, i) => (
                 <div>
                     <p>{item.name}: $ {item.price}</p>
-                    <UserInput price={item.price} />
-                    <b>{item.price}</b>
                 </div>
 
-            ))}
-            <Score number={stateWeighCO2.stateValue} />
+            ))} */}
+            <div>
+                <List
+                    size="large"
+                    bordered
+                    dataSource={data.hits}
+                    renderItem={item => <List.Item>{item.name} : {item.price} SEK </List.Item>}
+                />
+            </div>
+            <UserInput
+                valueName={inputName}
+                onChangeName={(e) => setInputName(e.target.value)}
+                valuePrice={inputPrice}
+                onChangePrice={(e) => setInputPrice(e.target.value)}
+            />
+            <Score number={score.value} />
             <button onClick={getScore}>cacultate</button>
         </div>
+
     );
 
 }
