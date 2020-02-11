@@ -36,6 +36,7 @@ export default function App() {
         }
         setScore({ value: `${Math.floor(data.hits.sum('price'))}` })
         console.log('check git')
+        console.log('check git2')
 
     };
 
